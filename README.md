@@ -42,6 +42,21 @@
 * 修改config.entry文件入口加vendor 
     > 然后在生产环境在配置optimize选项设置把vendor里面定义的文件全部和业务逻辑文件单独打包分离出来,没分离打包之前main.js是73kb 分离打包之后app.js是74byte 而vendor是72.3kb runtime(webpack)包是1.42kb
 ### 到此一个简单的vue项目工作流已经搭建好了
+                ###
+                ###
+### 补充生产环境打包hash,chunkhash,contenthash的区别
+* entry的js文件应该打包成chunkhash
+  > hash是根据整个JS模块的hash而定的,只要项目里面的文件有改动,整个项目的hash都得改变,并且全部文件共用一个hash,这个会造成浏览器缓存的问题出错,就是304和200的区别, 而且hash一个很严重的问题是即使你的内容没有改变,但是如果你重新编译了,hash的值也会改变
+  > chunkhash 顾名思义是模块hash，她是根据entry里面的每一个模块进行依赖文件解析,构建对应的hash,只要我们不改变共用库vendor的代码,共用库是不同的模块,会被单独打包,chunkhash的值就不会被影响
+* css文件应该打包成contenthash
+  > chunkhash打包之后app.js跟style.css的chunkhash值一样,因为app.js里面引入了style.css就是app依赖于style 所以打包的时候会被打包在同一个模块, 所以共用chunkhash,如果业务逻辑有改变的话,style.css的hash值也会改变,所以css会单独用contenthash,及时其他文件改变,只要css里面的内容不变,就不会重复构建
+  > 由于webpack的升级,直接打包成contenthash会出错,
+  需要更换成mini-css-extract-plugin代替extract-text-webpack-plugin 
+* npm i mini-css-extract-plugin
+  > 生产环境打包的时候切记mini-css-extract-plugin 不能跟热更新一起使用,会报错,需要注释掉hot这个参数和对应的plugin
+###### 一些特殊的说明
+  * css单独打包的时候不会把vue里面的css给分离出去 这是vue-loader的规定 ,但是不会影响性能, 因为vue-loader是会异步加载css,异步加载html的时候会异步将对应的css打包到对应的js页面里面
+  * 对应打包后生成的runtime.js是专门处理依赖的,里面是webpack打包后的js文件的依赖关系文件
 
 
 

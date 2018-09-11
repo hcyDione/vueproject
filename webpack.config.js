@@ -3,6 +3,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const HTMLPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 const ExtractPlugin = require('extract-text-webpack-plugin')
+//const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 //用cross-dev存储的环境变量是dev 还是prod 都存在在process.env 下面
 const isDev = process.env.NODE_ENV === 'development'
@@ -115,9 +116,23 @@ if (isDev) {
 			    'stylus-loader' //将stylus文件转化成css
 			]
 		})
+		/*use:[
+		    MiniCssExtractPlugin.loader,
+			'css-loader' ,//读出来css里面的文件
+			{
+			    loader: 'postcss-loader', 
+			    options: {
+			        sourceMap: true,  //直接使用syulus-loader生成好的sourcemap
+			    }//选项的作用用来提高效率
+			},
+			'stylus-loader' //将stylus文件转化成css
+		]*/
 	})
 	config.plugins.push(
 		new ExtractPlugin('styles.[hash:8].css')
+		/*new MiniCssExtractPlugin({
+            chunkFilename: 'styles.[contenthash:8].css'
+		})*/
 	)
 	config.optimization = {
 		splitChunks: {
